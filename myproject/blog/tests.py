@@ -14,3 +14,4 @@ class HomePageTest(TestCase):
         self.assertTrue(response.content.startswith(b'<html>'))
         self.assertIn(b'<title>Blog lists</title>', response.content)
         self.assertTrue(response.content.endswith(b'</html>'))
+        pass
