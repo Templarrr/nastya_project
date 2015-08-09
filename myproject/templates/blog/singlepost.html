@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block content %}
+        <div id="singlepost">
+                <p>{{ post.title }}</p>
+                <p>
+                {% autoescape off %}
+                {{ post.body }}
+                {% endautoescape %}
+                </p>
+                <p>Category: <a href="/blog/categories/{{ post.category.slug }}/">
+                   {{ post.category }}</a></p>
+        </div>
+{% endblock %}
