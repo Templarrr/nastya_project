@@ -26,3 +26,4 @@ def categories(request):
     category_list = Category.objects.order_by('name')
     context_dict = {'category_list':category_list }
     return render(request, 'blog/categories.html', context_dict)
+
