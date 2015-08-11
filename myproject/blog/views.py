@@ -1,10 +1,12 @@
 # -*- coding:utf-8 -*-
 from django.shortcuts import render, render_to_response
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 import datetime
 from blog.models import Category, Post
 from django.views.generic import TemplateView
 from blog.forms import UserForm, UserProfileForm
+from django.contrib.auth import authenticate, login
+from django.contrib.auth.decorators import login_required
 
 # Create your views here.
 #  home_page = None
@@ -97,3 +99,39 @@ def register(request):
     # Render the template depending on the context.
     return render(request, 'blog/register.html',
                   {'user_form': user_form, 'profile_form': profile_form, 'registered': registered})
+
+
+def user_login(request):
+    # If the request is a HTTP POST
+    if request.method == 'POST':
+
+        # Эта информация получена из login form.
+        # Мы используем request.POST.get('<variable>') вместо  request.POST['<variable>'],
+        # потому что request.POST.get('<variable>') вернет None, если значение не существует,
+        # в то время ка request.POST['<variable>'] вернет key error exception
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        # Проверка username/password
+        user = authenticate(username=username, password=password)
+        # Если создан объект user
+        # с необходимыми правами -  credentials
+        if user:
+            # Если account active? Он может быть disabled.
+            if user.is_active:
+                # Если account правильный и активный, можно логиниться.
+                # Переадресуем пользователя на страницу blog.
+                login(request, user)
+                return HttpResponseRedirect('/blog/')
+            else:
+                # Используется неактивный account - no logging in!
+                return HttpResponse("Your Blog account is disabled.")
+    # Запрос не HTTP POST, поэтому показываем login form.
+    else:
+        # Не переданы variables в template system
+        # пустой dictionary object...
+        return render(request, 'blog/login.html', {})
+
+@login_required
+def restricted(request):
+    return HttpResponse("Since you're logged in, you can see this text!")
+
