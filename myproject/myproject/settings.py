@@ -25,6 +25,7 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 LOGIN_URL = '/blog/login/'
+LOGOUT_URL = '/blog/logout/'
 
 # Application definition
 
