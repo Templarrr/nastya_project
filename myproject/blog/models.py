@@ -53,3 +53,13 @@ class UserProfile(models.Model):
     # Override the __unicode__() method to return out something meaningful!
     def __unicode__(self):
         return self.user.username
+
+class Comment(models.Model):
+    created = models.DateTimeField(auto_now_add=True)
+
+    author = models.ForeignKey(User)
+    body = models.TextField()
+    post = models.ForeignKey(Post)
+
+    def __unicode__(self):
+        return unicode("%s: %s" % (self.post, self.body[:60]))

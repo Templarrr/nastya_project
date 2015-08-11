@@ -2,7 +2,7 @@ from django import forms
 from django.contrib import admin
 from ckeditor.widgets import CKEditorWidget
 
-from blog.models import Category, Post, UserProfile
+from blog.models import Category, Post, UserProfile, Comment
 
 # Register your models here.
 
@@ -50,7 +50,10 @@ class CategoryAdmin(admin.ModelAdmin):
     prepopulated_fields = {'slug': ('name',)}
 
 # admin.site.register(Post, PostAdmin)
+class CommentAdmin(admin.ModelAdmin):
+    list_display = ["post", "author", "created"]
 
+admin.site.register(Comment, CommentAdmin)
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(Post, PostAdmin)
 admin.site.register(UserProfile)

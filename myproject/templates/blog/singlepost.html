@@ -1,13 +1,30 @@
-{% extends "base.html" %}
-{% block content %}
-        <div id="singlepost">
-                <p>{{ post.title }}</p>
-                <p>
-                {% autoescape off %}
-                {{ post.body }}
-                {% endautoescape %}
-                </p>
+{% extends "base.html" %} 
+{% block content %} 
+
+    <div id="singlepost"> 
+                <p>Title: {{ post.title }}</p> 
+                <p>Body: {{ post.body }}</p> 
                 <p>Category: <a href="/blog/categories/{{ post.category.slug }}/">
-                   {{ post.category }}</a></p>
-        </div>
+                                {{ post.category }}</a></p> 
+        <!-- Comments  -->
+       <!-- Comments  -->
+		{% if comments %}     <p>Comments:</p> 	{% endif %}
+		{% for comment in comments %}
+		    <div class="comment">
+		        <div class="time">{{ comment.created }} | {{ comment.author }}</div>
+		        <div class="body">{{ comment.body|linebreaks }}</div>
+		    </div>
+		{% endfor %}
+		{% if user.is_authenticated %}
+        <div id="addc">Add a comment</div>
+		<!-- Comment form  -->
+			<form action="/blog/add_comment/{{ post.slug }}/" method="POST">
+                                        {% csrf_token %} <!-- защита против CSRF атак -->
+    			<div id="cform"> <p>{{ form.body|linebreaks }}</p> </div>
+    			<div id="submit"><input type="submit" value="Submit"></div>
+			</form>
+			{% endif %}
+ 		</div>
+
+    </div> 
 {% endblock %}

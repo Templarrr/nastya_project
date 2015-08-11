@@ -1,12 +1,15 @@
 # -*- coding:utf-8 -*-
+from django.core.context_processors import csrf
 from django.shortcuts import render, render_to_response
 from django.http import HttpResponse, HttpResponseRedirect
 import datetime
-from blog.models import Category, Post
+from blog.models import Category, Post, Comment
 from django.views.generic import TemplateView
-from blog.forms import UserForm, UserProfileForm
+from blog.forms import UserForm, UserProfileForm, CommentForm
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator, InvalidPage, EmptyPage
+from django.core.urlresolvers import reverse
 
 # Create your views here.
 #  home_page = None
@@ -20,16 +23,25 @@ def home_page(request):
 
 
 def index(request):
-    posts_list = Post.objects.order_by('title')
-
+    posts_list = Post.objects.order_by("-created")
     category_list = Category.objects.order_by('name')
+    paginator = Paginator(posts_list, 2)
+    try: page = int(request.GET.get("page", '1'))
+    except ValueError: page = 1
+
+    try:
+        posts_list = paginator.page(page)
+    except (InvalidPage, EmptyPage):
+        posts_list = paginator.page(paginator.num_pages)
     context_dict = {'categories_list': category_list, 'posts_list': posts_list}
-    return render(request, 'blog/index.html', context_dict)
+    return render_to_response("blog/index.html", context_dict)
 
 
 def view(request, postslug):
     post = Post.objects.get(slug=postslug)
-    context = {'post': post}
+    comments = Comment.objects.filter(post=post)
+    context = {'post': post, "comments":comments,"form":CommentForm(), "user":request.user}
+    context.update(csrf(request))
     return render_to_response('blog/singlepost.html', context)
 
 
@@ -142,4 +154,18 @@ def user_logout(request):
     logout(request)
 
     # Take the user back to the homepage.
+    return HttpResponseRedirect('/blog/')
+
+def add_comment(request, postslug):
+    """Add a new comment."""
+    p = request.POST
+    if p["body"]:
+        author = request.user
+        comment = Comment(post=Post.objects.get(slug=postslug))
+        cf = CommentForm(p, instance=comment)
+
+        cf.fields["author"].required = False
+        comment = cf.save(commit=False)
+        comment.author = author
+        comment.save()
     return HttpResponseRedirect('/blog/')
