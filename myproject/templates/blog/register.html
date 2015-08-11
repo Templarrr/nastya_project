@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Cat Blog</title>
+    </head>
+
+    <body>
+        <h1>Register with cats</h1>
+{% if registered %}
+        Cat says: <strong>thank you for registering!</strong>
+        <a href="/blog/">Return to the homepage.</a><br />
+        {% else %}
+        Cat says: <strong>register here!</strong><br />
+    <form id="user_form" method="post" action="/blog/register/"
+                enctype="multipart/form-data">
+
+            {% csrf_token %}
+
+<!-- as_p method обернет каждый элемет в параграф  (<p>).
+Каждый элемент будет располагаться на новой строке. -->
+            {{ user_form.as_p }}
+            {{ profile_form.as_p }}
+
+            <!-- Кнопка submit формы. -->
+          <input type="submit" name="submit" value="Register" />
+     </form>
+
+ {% endif %}
+    </body>
+</html>

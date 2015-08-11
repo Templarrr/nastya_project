@@ -1,0 +1,50 @@
+{% extends "base.html" %} 
+{% load staticfiles %}
+
+{% block title %} {{ block.super }} - SECTION NAME {% endblock %}
+
+ {% block content %}
+    <a href="/blog/login/">Login</a>
+    {% if user.is_authenticated %}
+    <h1>Blog says... hello {{ user.username }}!</h1>
+    {% else %}
+    <h1>Blog says... hello world!</h1>
+    {% endif %}
+                {% if categories_list %}
+            <ul>
+                {% for category in categories_list %}
+                <li>{{ category.name }}</li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <strong>There are no categories present.</strong>
+        {% endif %}
+                {% if posts_list %}
+                <div id="postslist">
+                    {% for post in posts_list %}
+                    <p><a href="/blog/posts/{{ post.slug }}/">{{ post.title }}</a></p>
+                    {% endfor %}
+                </div>
+        {% else %}
+            <strong>There are no posts present.</strong>
+        {% endif %}
+<!-- Next/Prev page links  -->
+
+          <div class="pagination" style="margin-top: 20px; margin-left: -20px; ">
+            <span class="step-links">
+                {% if posts_list.has_previous %}
+                  <a href= "?page={{ posts_list.previous_page_number }}">
+                                    newer entries << </a>
+                {% endif %}
+
+                <span class="current">
+                     Page {{ posts_list.number }} of {{ posts_list.paginator.num_pages }}
+                </span>
+
+                {% if posts_list.has_next %}
+                    <a href="?page={{ posts_list.next_page_number }}"> >> older entries</a>
+                {% endif %}
+            </span>
+        </div>
+
+ {% endblock %}
